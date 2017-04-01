@@ -5,14 +5,57 @@ author:
     affiliation: Monash University
     address:
     - Department of Econometrics and Business Statistics
-    - Clayton, VIC 3800
+    - Clayton, VIC 3800, Australia
     email:  dicook@monash.edu
+  - name: Heike Hofmann
+    affiliation: Iowa State University
+    address: USA
+    email: hofmann@iastate.edu
   - name: Rob J Hyndman
     affiliation: Monash University
     address:
     - Department of Econometrics and Business Statistics
-    - Clayton, VIC 3800
+    - Clayton, VIC 3800, Australia
     email:  Rob.Hyndman@monash.edu
+  - name: Thomas Lumley
+    affiliation: University of Auckland
+    address: New Zealand
+    email: t.lumley@auckland.ac.nz
+  - name: Ben Marwick
+    affiliation: University of Washington
+    address: USA
+    email: bmarwick@uow.edu.au
+  - name: Carson Sievert
+    affiliation: Plotly
+    address: USA
+    email: cpsievert1@gmail.com
+  - name: Dilini Talagala
+    affiliation: Monash University
+    address:
+    - Department of Econometrics and Business Statistics
+    - Clayton, VIC 3800, Australia
+    email: Dilini.Talagala@monash.edu
+  - name: Nicholas Tomasetti
+    affiliation: Monash University
+    address:
+    - Department of Econometrics and Business Statistics
+    - Clayton, VIC 3800, Australia
+    email: Nicholas.Tomasetti@monash.edu
+  - name: Nicholas Tierney
+    affiliation: Queensland University of Technology
+    address: Australia
+    email: nicholas.tierney@gmail.com
+  - name: Earo Wang
+    affiliation: Monash University
+    address:
+    - Department of Econometrics and Business Statistics
+    - Clayton, VIC 3800, Australia
+    email:  Earo.Wang@monash.edu
+  - name: Fang Zhou
+    affiliation: Microsoft
+    address: Singapore
+    email: Fang.Zhou@microsoft.com
+
 abstract: >
   An abstract of less than 150 words.
 preamble: >
