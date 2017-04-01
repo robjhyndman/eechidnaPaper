@@ -89,6 +89,7 @@ library(purrr)
 library(knitr)
 library(broom)
 library(tidyr)
+library(ggthemes)
 ```
 
 
@@ -461,7 +462,7 @@ In the above table (which shows just the first ten rows for convienience) we see
 
 ## Which candidate won with the smallest number of votes?
 
-```{r who_won_least_votes_prop}
+```{r who_won_least_votes_prop, echo=FALSE}
 who_won_least_votes_prop <- 
  aec2013_fp %>% 
    filter(CandidateID != 999) %>% # keep only the winners
@@ -585,7 +586,7 @@ One of our motivations for creating this package was to make it easy to explore 
 
 Here's how we join the two datasets together, the common variable is the Electorate:
 
-```{r join_census_and_election}
+```{r join_census_and_election, echo=FALSE}
 census_and_election <- left_join(aec2013_2pp_electorate, 
                                  abs2011,
                                  by = c("Electorate" = "Electorate"))
@@ -676,8 +677,50 @@ census_and_election %>%
 
 
 
-#Cartograms
+#Maps and Cartograms
 
+The AEC provides spatial boundaries of Federal Electorates in several formats. The package provides functions for reading these in to R, in order to make maps of the electoral districts and chloropleth maps of results and electoral demographics from the Census data. Figure \ref{results-map} displays the results of the 2016 Federal election on the map. Australia's sparse geography makes it impossible to obtain an accurate impression of the electoral results from this map. 
+
+```{r message=FALSE, error = TRUE, warning=FALSE, echo=FALSE, fig.caption="Electoral results shown on the map. Impossible to get a sense of the results due to the sparseness of the Australian geography."}
+data(nat_map_2016)
+data(aec2016_fp_electorate)
+map.winners <- aec2016_fp_electorate %>% filter(Elected == "Y") %>% 
+  select(Electorate, PartyNm) %>% 
+  dplyr::rename(Elect_div = Electorate)
+  #merge(nat_map_2016, by.x="Electorate", by.y="Elect_div")
+# Grouping different Lib/Nats togethers
+map.winners$PartyNm <- as.character(map.winners$PartyNm)
+coalition <- c("Liberal", "The Nationals")
+map.winners.grouped <- mutate(map.winners, 
+    PartyNm = ifelse(PartyNm %in% coalition,
+       "Liberal National Coalition", PartyNm))
+map.winners.grouped <- dplyr::left_join(map.winners.grouped,
+          distinct(select(nat_map_2016, Elect_div, id)))
+
+# Colour cells to match that parties colours
+# Order = Australian Labor Party, Independent, Katters, Lib/Nats Coalition, Xenophon, The Greens
+partycolours = c("#FF0033", "#000000", "#CC3300", "#0066CC", "#FF6600", "#009900")
+ggplot(data=map.winners.grouped, aes(map_id=id)) + 
+  geom_map(aes(fill=PartyNm), map=nat_map_2016) +
+  scale_fill_manual(name="Political Party", values=partycolours) +
+  expand_limits(x=nat_map_2016$long, y=nat_map_2016$lat) +
+  theme_map() + coord_equal() + theme(legend.position="bottom")
+```
+
+The usual approach to transform small areas on a map to better reflect the distribution of votes is a cartogram (XXX Needs citation). This works very nicely for the USA, where the electorate unit is a state. The geographic area of the states is relatively uniform compared to the Australian electorates' size, and so a cartogram gently expands the small areas, and shrinks the large to enable the gist of the results to be communicated nicely. However, vast open space of western Queensland, New South Wales, South Australia, Western Australia and the Northern Territory relative the the tiny electorates in the city breaks the algorithm, and at very best would so warp the Australian geography to make it unrecognisable. 
+
+The solution we arrived at was to use a Dorling cartogram algorithm which represents geographic areas as circles, and gently shifts the circles to expand important small, close geographic regions. This algorithm is applied separately for each city, and the results are combined. Each electorate becomes a dot on the map, and the dots for city electorates are exploded, to enable each to be seen. Figure \ref{} shows this approach for the 2016 results. 
+
+```{r message=FALSE, error = TRUE, warning=FALSE, echo=FALSE, fig.caption="Electoral results shown on the map. Impossible to get a sense of the results due to the sparseness of the Australian geography."}
+data(nat_data_2016_cart)
+map.winners.grouped <- dplyr::left_join(map.winners.grouped, select(nat_data_2016_cart, id, x, y))
+ggplot(data=map.winners.grouped, aes(map_id=id)) + 
+  geom_map(map=nat_map_2016, fill="grey90", colour="white") +
+  geom_point(data=map.winners.grouped, aes(x=x, y=y, colour=PartyNm), inherit.aes=FALSE) +
+  scale_colour_manual(name="Political Party", values=partycolours) +
+  expand_limits(x=nat_map_2016$long, y=nat_map_2016$lat) +
+  theme_map() + coord_equal() + theme(legend.position="bottom")
+```
 #Shiny web app
 
 #Discussion
