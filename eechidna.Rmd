@@ -80,7 +80,10 @@ number_sections: yes
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, cache=TRUE, messages=FALSE, warning=FALSE)
-# Make sure you have rticles installed.
+```
+
+```{r packages, echo=TRUE}
+# Required packages to reproduce this analysis
 library(eechidna)
 library(ggplot2)
 library(plyr)
@@ -89,6 +92,10 @@ library(purrr)
 library(knitr)
 library(broom)
 library(tidyr)
+library(scales)
+library(gridExtra)
+library(GGally)
+library(corrplot)
 ```
 
 
@@ -365,8 +372,6 @@ who_won %>%
   knitr::kable()
 
 # plot
-library(ggplot2)
-library(scales)
 ggplot(who_won, 
        aes(reorder(PartyNm, n), 
            n)) +
@@ -547,7 +552,6 @@ p <- aec2013_fp %>%
        theme(text = element_text(size=10)))
 
 # draw the plots
-library(gridExtra)
 n <- length(p$plots)
 nCol <- floor(sqrt(n))
 do.call("grid.arrange", c(p$plots, ncol=nCol))
@@ -573,7 +577,6 @@ proportions <- aec2013_fp %>%
             Prop_Greens = sum(OrdinaryVotes[PartyNm == "The Greens"]) / sum(OrdinaryVotes)) 
 
 # make a scatterplot matrix
-library(GGally)
 ggpairs(proportions, columns = 2:ncol(proportions)) + theme_bw()
 
 ```
@@ -603,7 +606,6 @@ census_and_election_subset <-
          Population:NotOwned)  %>% 
   rename(ALP_perc = Average_Australian_Labor_Party_Percentage_in_electorate)
 
-library(corrplot)
 M <- cor(census_and_election_subset[, c(2:ncol(census_and_election_subset))], 
          use = "pairwise.complete.obs")
 corrplot.mixed(M, 
