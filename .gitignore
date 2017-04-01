@@ -1,5 +1,7 @@
 RJwrapper.*
 eechidna.tex
 .Rproj.user
+.Rhistory
+.Rdata
 eechidna_files/
 eechidna_cache/
