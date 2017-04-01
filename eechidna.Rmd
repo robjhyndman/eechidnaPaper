@@ -84,6 +84,7 @@ knitr::opts_chunk$set(echo = FALSE, cache=TRUE, messages=FALSE, warning=FALSE)
 library(eechidna)
 library(ggplot2)
 library(tidyverse)
+library(broom)
 ```
 
 
@@ -357,7 +358,7 @@ who_won <- aec2013_2pp_electorate %>%
 
 # inspect
 who_won %>% 
-  kable()
+  knitr::kable()
 
 # plot
 library(ggplot2)
