@@ -208,7 +208,7 @@ function(str) gsub("\\", "\\verb|", str, fixed = TRUE))
 
 There are many age groups. To look at all of them at once, we can gather them into a dataframe ready for plotting using `tidyr`.
 
-```{r, echo=TRUE}
+```{r abs2011, fig.cap="Test", echo=TRUE}
 abs2011 %>%
   select(starts_with("Age"), 
          Electorate) %>%
@@ -225,14 +225,12 @@ abs2011 %>%
   theme(legend.position = "none") +
   labs(x = "Age Groups",
        y = "% in Electorate")
-
-
 ```
 
-We can look at the relationship between income and state (Figure ??)  and the relationship between income and education (Figure ??).
+We can look at the relationship between income and state (Figure \ref{fig:abs2011b})  and the relationship between income and education (Figure \ref{fig:abs2011c}).
 
 
-```{r}
+```{r abs2011b, fig.cap="TBC"}
 ggplot(data = abs2011,
        aes(x = reorder(State, -MedianIncome),
            y = MedianIncome,
@@ -248,7 +246,7 @@ ggplot(data = abs2011,
 ```
 
 
-```{r, message=FALSE}
+```{r abs2011c, fig.cap="TBC", message=FALSE}
 abs2011 %>%
   select(Postgraduate,
          Bachelor,
@@ -268,8 +266,7 @@ ggplot(data = ,
 
 Let's look at all of the religions
 
-```{r}
-
+```{r abs2011d, fig.cap="TBC"}
 abs2011 %>%
   select(Christianity,
          Catholic,
@@ -288,14 +285,11 @@ abs2011 %>%
   theme(legend.position = "none") +
   coord_flip() + 
   labs(x = "Religion")
-             
-
 ```
 
 
 
 ```{r}
-
 ggplot(data = abs2011,
        aes(x = reorder(State, -Christianity),
            y = Christianity,
