@@ -7,6 +7,10 @@ author:
     - Department of Econometrics and Business Statistics
     - Clayton, VIC 3800, Australia
     email:  dicook@monash.edu
+  - name: Anthony Ebert
+    affiliation: Queensland University of Technology
+    address: Australia
+    email: anthonyebert@gmail.com
   - name: Heike Hofmann
     affiliation: Iowa State University
     address: USA
@@ -29,22 +33,26 @@ author:
     affiliation: Plotly
     address: USA
     email: cpsievert1@gmail.com
+  - name: Mingzhu Sun
+    affiliation: University of Queensland
+    address: Australia
+    email: m.sun1@uq.edu.au
   - name: Dilini Talagala
     affiliation: Monash University
     address:
     - Department of Econometrics and Business Statistics
     - Clayton, VIC 3800, Australia
     email: Dilini.Talagala@monash.edu
-  - name: Nicholas Tomasetti
-    affiliation: Monash University
-    address:
-    - Department of Econometrics and Business Statistics
-    - Clayton, VIC 3800, Australia
-    email: Nicholas.Tomasetti@monash.edu
   - name: Nicholas Tierney
     affiliation: Queensland University of Technology
     address: Australia
     email: nicholas.tierney@gmail.com
+  - name: Nathaniel Tomasetti
+    affiliation: Monash University
+    address:
+    - Department of Econometrics and Business Statistics
+    - Clayton, VIC 3800, Australia
+    email: Nathaniel.Tomasetti@monash.edu
   - name: Earo Wang
     affiliation: Monash University
     address:
@@ -58,9 +66,15 @@ author:
 
 abstract: >
   An abstract of less than 150 words.
-preamble: >
-  % Any extra latex you need in the preamble
+bibliography: RJreferences.bib
 output: rticles::rjournal_article
+fig_caption: yes
+fig_height: 5
+fig_width: 8
+includes:
+  in_header: preamble.tex
+keep_tex: yes
+number_sections: yes
 ---
 
 
@@ -71,40 +85,336 @@ library(eechidna)
 library(ggplot2)
 ```
 
-## Introduction
-
-Introductory section which may include references in parentheses
-\citep{R}, or cite a reference such as \citet{R} in the text.
-
-
-## Summary
-
-This file is only a basic article template. For full details of _The R Journal_ style and information on how to prepare your article for submission, see the [Instructions for Authors](https://journal.r-project.org/share/author-guide.pdf).
-
 
 #Introduction
 
 
-The R package `eechidna` provides data from the 2013 and 2016 Australian Federal Elections and 2011 and 2016 Australian Censuses for each House of Representatives electorate, along with some tools for visualizing and analysing the data.
+The `eechidna` package for R \citep{R} provides data from the 2013 and 2016 Australian Federal Elections and the 2011 and 2016 Australian Censuses for each House of Representatives electorate, along with some tools for visualizing and analysing the data. The name of the package is an acronym for ``Exploring Election and Census Highly Informative Data Nationally for Australia'', and is an allusion to the echidna, an Australian egg-laying marsupial.
 
-This package was developed during the rOpenSci auunconf event in Brisbane, Queensland, during 21-22 April 2016. Peter Ellis' work on the NZ electoral data was an important inspiration for this pack
+This package was initially developed during the rOpenSci auunconf event in Brisbane, Queensland, during 21--22 April 2016. It was later updated during another rOpenSci auunconf in Brisbane on 31 March--1 April 2017.
 
-
-R journal
-
+The `nzelect` \citep{nzelect} package was an important inspiration for this pack
 
 
-Intro about purpose
+#Data
 
-Data
+## Census Data
+
+The 2011 and 2016 Australian Census data were obtained from the Australian Bureau of Statistics and are available in the package as `abs2011` and `abs2016`. These data frames contain 150 rows each, corresponding to the 150 electorates in the 2013 and 2016 Australian House of Representatives elections (\url{http://www.aec.gov.au/profiles/}). The 35 columns in each data frame largely comprise demographic summaries of each electorate. These are summarized in Table \@ref(display-data-dictionary).
+
+
+Each column is now described here:
+
+```{r make-data-dictionary, include = FALSE}
+
+data_dictionary <- data.frame(
+  Variable = c(
+    "ID",
+    "Electorate",
+    "State",
+    "Population",
+    "Area",
+    "MedianIncome",
+    "Unemployed",
+    "Bachelor",
+    "Postgraduate",
+    "Christianity",
+    "Catholic",
+    "Buddhism",
+    "Islam",
+    "Judaism",
+    "NoReligion",
+    "Age00\\_04",
+    "Age05\\_14",
+    "Age15\\_19",
+    "Age20\\_24",
+    "Age25\\_34",
+    "Age35\\_44",
+    "Age45\\_54",
+    "Age55\\_64",
+    "Age65\\_74",
+    "Age75\\_84",
+    "Age85plus",
+    "BornOverseas",
+    "Indigenous",
+    "EnglishOnly",
+    "OtherLanguageHome",
+    "Married",
+    "DeFacto",
+    "FamilyRatio",
+    "Internet", 
+    "NotOwned"
+    ), 
+  Details = c(
+    "Commonwealth Electoral District identifier",
+    "Name of electorate",
+    "State containing electorate",
+    "Total population of electorate",
+    "Area of electorate in square kilometres",
+    "Median income of people within electorate",
+    "Percentage of people unemployed",
+    "Percentage of people whose highest qualification is a Bachelor degree",
+    "Percentage of people whose highest qualification is a postgraduate degree",
+    "Percentage of people affiliated with the Christian religion (of all denominations)",
+    "Percentage of people affiliated with the Catholic denomimation.",
+    "Percentage of people affiliated with the Buddhist religion.",
+    "Percentage of people affiliated with the Islam religion.",
+    "Percentage of people affiliated with the Jewish religion. ",
+    "Percentage of people with no religion.",
+    "Percentage of people aged 0-4.",
+    "Percentage of people aged 5-9.",
+    "Percentage of people aged 15-19.",
+    "Percentage of people aged 20-24.",
+    "Percentage of people aged 25-34.",
+    "Percentage of people aged 35-44.",
+    "Percentage of people aged 45-54.",
+    "Percentage of people aged 55-64.",
+    "Percentage of people aged 65-74.",
+    "Percentage of people aged 75-84.",
+    "Percentage of people aged 85 or higher.",
+    "Percentage of people born outside Australia.",
+    "Percentage of people who are Indigenous",
+    "Percentage of people who speak only English",
+    "Percentage of people who speak a language other than English at home",
+    "Percentage of people who are married",
+    "Percentage of people who are in a de facto marriage",
+    "Total number of families to total number of people (times 100)",
+    "Percentage of people with home internet",
+    "Percentage of dwellings not owned (either outright or with a mortgage)")
+) # close data_frame
+```
+
+```{r display-data-dictionary, echo = FALSE, cache=FALSE}
+knitr::kable(data_dictionary,
+  caption="Test")
+```
+
+
+
  - raw and processed
 
 
+#Examples. 
 
-Examples. Take from vignettes
+###Exploring the 2011 Census data
 
-Shiny web app
+Plots from the vignette.
 
+
+
+However, there are many age groups. To look at all of them at once, we can gather them into a dataframe ready for plotting using `tidyr`.
+
+```{r}
+
+library(tidyr)
+
+abs2011 %>%
+  select(starts_with("Age"), 
+         Electorate) %>%
+  gather(key = "Age",
+         value = "Percent_in_electorate",
+         -Electorate) %>% 
+  ggplot(data = .,
+         aes(x = reorder(Age, - Percent_in_electorate),
+             y = Percent_in_electorate,
+             colour = Age)) +
+  geom_boxplot() + 
+  coord_flip() + 
+  theme_minimal() + 
+  theme(legend.position = "none") +
+  labs(x = "Age Groups",
+       y = "% in Electorate")
+
+
+```
+
+## Income
+
+```{r}
+
+ggplot(data = abs2011,
+       aes(x = MedianIncome)) + 
+  geom_density(fill = "salmon",
+               bw = "SJ",
+               colour = NA) + 
+  xlim(250,1100) +
+  geom_rug(colour = "salmon") + 
+  theme_minimal()
+  
+```
+
+
+If you're intersted in getting a sense of the distribution of the data, you can add in the points to get a bit more of a sense on the distribution.
+
+```{r}
+
+ggplot(data = abs2011,
+       aes(x = reorder(State, -MedianIncome),
+           y = MedianIncome,
+           colour = State)) + 
+  geom_boxplot() + 
+  geom_jitter(alpha = 0.35, 
+              size = 2,
+              width = 0.3) +
+  theme_minimal() + 
+  theme(legend.position = "none") + 
+  labs(x = "State")
+
+```
+
+##### Bachelor and income
+
+```{r}
+
+ggplot(data = abs2011,
+       aes(x = Bachelor,
+           y = MedianIncome)) + 
+  geom_point(colour = "steelblue",
+             alpha = 0.75) + 
+  theme_minimal()
+
+```
+
+
+## Postgraduate
+
+
+```{r}
+
+ggplot(data = abs2011,
+       aes(x = reorder(State, -Postgraduate),
+           y = Postgraduate,
+           colour = State)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(x = "State") + 
+  theme(legend.position = "none")
+
+```
+
+##### Postgraduate and income
+
+```{r}
+
+ggplot(data = abs2011,
+       aes(x = Postgraduate,
+           y = MedianIncome)) + 
+  geom_point(colour = "steelblue",
+             alpha = 0.75) + 
+  theme_minimal()
+  
+```
+
+##### Comparing income across Bachelors and postgraduate
+
+```{r}
+
+abs2011 %>%
+  select(Postgraduate,
+         Bachelor,
+         MedianIncome) %>% 
+  gather(key = "Education",
+         value = "Prop_Educated",
+         -MedianIncome) %>%
+ggplot(data = ,
+       aes(x = Prop_Educated,
+           y = MedianIncome,
+           colour = Education)) + 
+  geom_point() + 
+  geom_smooth() +
+  theme_minimal() +
+  scale_color_brewer(type = "qual", palette = "Set1")
+  # theme(legend.position = "bottom",
+  #       legend.direction = "vertical")
+
+```
+
+## Religion
+
+Let's look at all of the religions
+
+```{r}
+
+abs2011 %>%
+  select(Christianity,
+         Catholic,
+         Buddhism,
+         Islam,
+         Judaism,
+         NoReligion) %>%
+  gather(key = "ReligionType",
+         value = "Percent") %>%
+  ggplot(data = .,
+         aes(x = reorder(ReligionType, -Percent),
+             y = Percent,
+             colour = ReligionType)) + 
+  geom_boxplot() + 
+  theme_minimal() + 
+  theme(legend.position = "none") +
+  coord_flip() + 
+  labs(x = "Religion")
+             
+
+```
+
+##### Christianity by State
+
+
+```{r}
+
+ggplot(data = abs2011,
+       aes(x = reorder(State, -Christianity),
+           y = Christianity,
+           colour = State)) + 
+  geom_boxplot() +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  coord_flip() + 
+  labs(x = "State")
+  
+           
+
+```
+
+## Internet
+
+```{r}
+
+ggplot(data = abs2011,
+       aes(x = Internet)) +
+  geom_density(fill = "steelblue",
+               bw = "SJ",
+               colour = NA) + 
+  geom_rug(colour = "steelblue") + 
+  theme_minimal() + 
+  labs(x = "% of electorate with Internet") +
+  xlim(85, 100)
+
+```
+
+
+## Internet by state
+
+```{r}
+
+ggplot(data = abs2011,
+       aes(x = reorder(State, -Internet),
+           y = Internet,
+           colour = State)) + 
+  geom_boxplot() +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  coord_flip() + 
+  labs(x = "State")
+
+```
+
+
+#Cartograms
+
+#Shiny web app
+
+#Discussion
 
 Discussion about difficulties and futrue development
 
