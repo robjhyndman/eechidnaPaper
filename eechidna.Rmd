@@ -83,6 +83,7 @@ knitr::opts_chunk$set(echo = FALSE, cache=TRUE, messages=FALSE, warning=FALSE)
 # Make sure you have rticles installed.
 library(eechidna)
 library(ggplot2)
+library(magrittr)
 ```
 
 
@@ -98,53 +99,42 @@ The `nzelect` \citep{nzelect} package was an important inspiration for this pack
 
 #Data
 
+## Election Data
+
+The data for the 2013 and 2016 Australian Federal Elections for the House of Representative were obtained from \url{http://results.aec.gov.au/}. These data are copyright Commonwealth of Australia (Australian Electoral Commission) 2013, 2016.
+
+In the `eechidna` package we have eight election datasets:
+
+\begin{table}[htb]\centering
+\begin{tabular}{ll}
+\toprule
+\bfseries Data object name & \bf Description \\
+\midrule
+\bfseries 2013 election\\ 
+\verb|aec2013_fp|              & first preference votes for candidates at each polling place\\
+\verb|aec2013_fp_electorate|   & first preference votes for candidates at each electorate\\
+\verb|aec2013_2pp|             & two party preferred votes for candidates at each polling place\\
+\verb|aec2013_2pp_electorate|  & two party preferred votes for candidates at each electorate\\
+\bfseries 2016 election\\ 
+\verb|aec2016_fp|              & first preference votes for candidates at each polling place\\
+\verb|aec2016_fp_electorate|   & first preference votes for candidates at each electorate\\
+\verb|aec2016_2pp|             & two party preferred votes for candidates at each polling place\\
+\verb|aec2016_2pp_electorate|  & two party preferred votes for candidates at each electorate\\
+\bottomrule
+\end{tabular}
+\caption{Australian Election Data sets.}
+\end{table}
+
+The 2013 data sets contains `r formatC(nrow(aec2013_fp), big.mark=",", drop0trailing=TRUE, format="f")` rows and `r ncol(aec2013_fp)` columns. The 2016 data sets contains `r formatC(nrow(aec2016_fp), big.mark=",", drop0trailing=TRUE, format="f")` rows and `r ncol(aec2016_fp)` columns. Note that some parties have slightly different names in different states. For example there is "The Nationals" and the "National Party". We've simplified the data by renaming some of the parties to the variant of the name that won the most votes. 
+
 ## Census Data
 
-The 2011 and 2016 Australian Census data were obtained from the Australian Bureau of Statistics and are available in the package as `abs2011` and `abs2016`. These data frames contain 150 rows each, corresponding to the 150 electorates in the 2013 and 2016 Australian House of Representatives elections (\url{http://www.aec.gov.au/profiles/}). The 35 columns in each data frame largely comprise demographic summaries of each electorate. These are summarized in Table \@ref(display-data-dictionary).
+The 2011 and 2016 Australian Census data were obtained from the Australian Bureau of Statistics and are available in the package as `abs2011` and `abs2016`. These data frames contain 150 rows each, corresponding to the 150 electorates in the 2013 and 2016 Australian House of Representatives elections (\url{http://www.aec.gov.au/profiles/}). The `r ncol(abs2011)` columns in each data frame largely comprise demographic summaries of each electorate. These are summarized in Table \ref{abs2011}.
 
-
-Each column is now described here:
 
 ```{r make-data-dictionary, include = FALSE}
-
 data_dictionary <- data.frame(
-  Variable = c(
-    "ID",
-    "Electorate",
-    "State",
-    "Population",
-    "Area",
-    "MedianIncome",
-    "Unemployed",
-    "Bachelor",
-    "Postgraduate",
-    "Christianity",
-    "Catholic",
-    "Buddhism",
-    "Islam",
-    "Judaism",
-    "NoReligion",
-    "Age00\\_04",
-    "Age05\\_14",
-    "Age15\\_19",
-    "Age20\\_24",
-    "Age25\\_34",
-    "Age35\\_44",
-    "Age45\\_54",
-    "Age55\\_64",
-    "Age65\\_74",
-    "Age75\\_84",
-    "Age85plus",
-    "BornOverseas",
-    "Indigenous",
-    "EnglishOnly",
-    "OtherLanguageHome",
-    "Married",
-    "DeFacto",
-    "FamilyRatio",
-    "Internet", 
-    "NotOwned"
-    ), 
+  Variable = paste("\\",colnames(abs2011),"|",sep=""),
   Details = c(
     "Commonwealth Electoral District identifier",
     "Name of electorate",
@@ -184,10 +174,21 @@ data_dictionary <- data.frame(
 ) # close data_frame
 ```
 
-```{r display-data-dictionary, echo = FALSE, cache=FALSE}
-knitr::kable(data_dictionary,
-  caption="Test")
+```{r display-data-dictionary, cache=FALSE, results="asis", message=FALSE}
+xtable::xtable(data_dictionary,
+               label="abs2011",
+               caption="Variables from the 2011 Census Data.") %>%
+print(type="latex",
+  size="small",
+  comment=FALSE,
+  booktabs=TRUE,
+  include.rownames=FALSE,
+  sanitize.colnames.function =  function(x){paste0('\\textbf{', x, '}')
+},
+  sanitize.text.function =
+function(str) gsub("\\", "\\verb|", str, fixed = TRUE))
 ```
+
 
 
 
