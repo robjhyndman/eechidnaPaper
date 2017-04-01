@@ -319,23 +319,6 @@ ggplot(data = abs2011,
 
 ```
 
-## Internet
-
-```{r}
-
-ggplot(data = abs2011,
-       aes(x = Internet)) +
-  geom_density(fill = "steelblue",
-               bw = "SJ",
-               colour = NA) + 
-  geom_rug(colour = "steelblue") + 
-  theme_minimal() + 
-  labs(x = "% of electorate with Internet") +
-  xlim(85, 100)
-
-```
-
-
 ## Internet by state
 
 ```{r}
