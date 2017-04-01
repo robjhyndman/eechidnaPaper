@@ -350,9 +350,9 @@ An alternative way to evaluate the outcome of the election is by counting the nu
 
 ```{r total_votes_for_parties}
 total_votes_for_parties <- aec2016_fp %>% 
-  select(PartyNm, OrdinaryVotes) %>% 
-  group_by(PartyNm) %>% 
-  summarise(total_votes = sum(OrdinaryVotes, rm.na = TRUE)) %>% 
+  dplyr::select(PartyNm, OrdinaryVotes) %>% 
+  dplyr::group_by(PartyNm) %>% 
+  dplyr::summarise(total_votes = sum(OrdinaryVotes, na.rm = TRUE)) %>% 
   ungroup() %>%
   arrange(desc(total_votes))
 ```
@@ -361,8 +361,8 @@ We can plot the ordinary vote count, showing the Liberal Party receiving the mos
 
 ```{r plot_total_votes_for_parties,  fig.height = 6}
 ggplot(total_votes_for_parties, 
-       aes(reorder(PartyNm, total_votes), 
-           total_votes)) +
+       aes(x=reorder(PartyNm, total_votes), 
+           y=total_votes)) +
   geom_point(size = 2) + 
   coord_flip() + 
   scale_y_continuous(labels = comma) +
@@ -378,12 +378,11 @@ ggplot(total_votes_for_parties,
 There are a few ways we can answer this question. We can see who received the highest number of ordinary votes, like this:
 
 ```{r who_most-votes, results="asis"}
-who_most_votes <- 
-aec2013_fp %>% 
-  filter(CandidateID != 999) %>% #exclude informal votes
-  mutate(candidate_full_name = paste0(GivenNm, " ", Surname, " (", CandidateID, ")")) %>% 
-  group_by(candidate_full_name) %>% 
-  summarise(total_votes_for_candidate = sum(OrdinaryVotes, rm.na = TRUE)) %>% 
+who_most_votes <- aec2013_fp %>% 
+  dplyr::filter(CandidateID != 999) %>% #exclude informal votes
+  dplyr::mutate(candidate_full_name = paste0(GivenNm, " ", Surname, " (", CandidateID, ")")) %>% 
+  dplyr::group_by(candidate_full_name) %>% 
+  dplyr::summarise(total_votes_for_candidate = sum(OrdinaryVotes, rm.na = TRUE)) %>% 
   arrange(desc(total_votes_for_candidate))
 # inspect
 who_most_votes %>% 
@@ -398,14 +397,13 @@ who_most_votes %>%
 But this is a crude measure of how successful a candidate was in the election, because electorates with more people will result in more votes for the winner, even if the victory is only by a tiny margin. So let's see remove the effect of the population size in the electorates by finding out who won the highest proportion of votes in their electorate. 
 
 ```{r who_highest_proportion-votes, results="asis"}
-who_most_votes_prop <- 
-aec2013_fp %>% 
-  filter(CandidateID != 999) %>% #exclude informal votes
-  mutate(candidate_full_name = 
+who_most_votes_prop <- aec2013_fp %>% 
+  dplyr::filter(CandidateID != 999) %>% #exclude informal votes
+  dplyr::mutate(candidate_full_name = 
            paste0(GivenNm, " ", Surname, " (", CandidateID, ")")) %>% 
-  group_by(Electorate, candidate_full_name) %>% 
-  summarise(sum_votes = sum(OrdinaryVotes))  %>% 
-  mutate(prop_votes = round(sum_votes / sum(sum_votes), 3),
+  dplyr::group_by(Electorate, candidate_full_name) %>% 
+  dplyr::summarise(sum_votes = sum(OrdinaryVotes))  %>% 
+  dplyr::mutate(prop_votes = round(sum_votes / sum(sum_votes), 3),
          sum_votes = prettyNum(sum_votes, ",")) %>% 
   ungroup %>% 
   arrange(desc(prop_votes))
@@ -424,20 +422,19 @@ In the above table (which shows just the first ten rows for convienience) we see
 
 
 ```{r who_won_least_votes_prop, results="asis", echo=FALSE}
-who_won_least_votes_prop <- 
- aec2016_fp %>% 
-   filter(CandidateID != 999) %>% # keep only the winners
-   mutate(candidate_full_name = 
+who_won_least_votes_prop <- aec2016_fp %>% 
+   dplyr::filter(CandidateID != 999) %>% # keep only the winners
+   dplyr::mutate(candidate_full_name = 
             paste0(GivenNm, " ", Surname, " (", CandidateID, ")")) %>% 
-   group_by(Electorate, candidate_full_name) %>% 
-   summarise(sum_votes = sum(OrdinaryVotes)) %>% 
-   mutate(prop_votes = round(sum_votes / sum(sum_votes), 2)) %>% 
+   dplyr::group_by(Electorate, candidate_full_name) %>% 
+   dplyr::summarise(sum_votes = sum(OrdinaryVotes)) %>% 
+   dplyr::mutate(prop_votes = round(sum_votes / sum(sum_votes), 2)) %>% 
    ungroup %>% 
-   left_join(aec2013_2pp_electorate %>% 
-               mutate(candidate_full_name = 
+   dplyr::left_join(aec2013_2pp_electorate %>% 
+               dplyr::mutate(candidate_full_name = 
             paste0(GivenNm, " ", Surname, " (", CandidateID, ")")), "candidate_full_name") %>% 
-   filter(Elected == "Y") %>% 
-   select(Electorate.x, 
+   dplyr::filter(Elected == "Y") %>% 
+   dplyr::select(Electorate.x, 
           candidate_full_name, 
           prop_votes, 
           PartyNm) %>% 
@@ -454,19 +451,18 @@ The table above shows that Clive Palmer won his electorate by the smallest margi
 
 
 ```{r fairfax, results="asis"}
-fairfax <- 
-aec2016_fp %>% 
-  filter(CandidateID != 999) %>% # exclude informal votes
-  filter(Electorate == "Fairfax") %>% 
-  mutate(candidate_full_name = 
+fairfax <- aec2016_fp %>% 
+  dplyr::filter(CandidateID != 999) %>% # exclude informal votes
+  dplyr::filter(Electorate == "Fairfax") %>% 
+  dplyr::mutate(candidate_full_name = 
            paste0(GivenNm, " ", 
                   Surname, 
                   " (", 
                   CandidateID, 
                   ")")) %>% 
-  group_by(Electorate, candidate_full_name) %>% 
-  summarise(sum_votes = sum(OrdinaryVotes)) %>% 
-  mutate(prop_votes = round(sum_votes / sum(sum_votes), 2),
+  dplyr::group_by(Electorate, candidate_full_name) %>% 
+  dplyr::summarise(sum_votes = sum(OrdinaryVotes)) %>% 
+  dplyr::mutate(prop_votes = round(sum_votes / sum(sum_votes), 2),
          sum_votes = prettyNum(sum_votes, big.mark = ",")) %>% 
   ungroup %>% 
   arrange(desc(prop_votes))
@@ -487,14 +483,14 @@ We can look at the proportion of voters for a particular party in each electorat
 ```{r plot_prop_particular_party, fig.height = 8}
 # summarise and compute proportion of votes for a particular party
 p <- aec2016_fp %>%
-    filter(CandidateID != 999) %>% # exclude informal votes
-  group_by(Electorate, State) %>%
-  summarise(
+    dplyr::filter(CandidateID != 999) %>% # exclude informal votes
+  dplyr::group_by(Electorate, State) %>%
+  dplyr::summarise(
     TotalVotes = sum(OrdinaryVotes),
     ProportionLabor = round(sum(OrdinaryVotes[PartyNm == "Australian Labor Party"]) / TotalVotes, 3)) %>%
-  filter(TotalVotes != 0) %>% 
+  dplyr::filter(TotalVotes != 0) %>% 
   arrange(desc(ProportionLabor)) %>% 
-  group_by(State) %>% 
+  dplyr::group_by(State) %>% 
   # send the data to the plotting function
   do(plots=ggplot(data = .) + 
        aes(x = ProportionLabor, 
@@ -561,10 +557,10 @@ Now we can easily explore some relationships between the census data and the two
 census_and_election_subset <-  
   census_and_election %>% 
   ungroup %>% 
-  select(Electorate, 
+  dplyr::select(Electorate, 
          Average_Australian_Labor_Party_Percentage_in_electorate,
          Population:NotOwned)  %>% 
-  rename(ALP_perc = Average_Australian_Labor_Party_Percentage_in_electorate)
+  dplyr::rename(ALP_perc = Average_Australian_Labor_Party_Percentage_in_electorate)
 
 M <- cor(census_and_election_subset[, c(2:ncol(census_and_election_subset))], 
          use = "pairwise.complete.obs")
@@ -678,7 +674,8 @@ data(nat_data_2016_cart)
 map.winners.grouped <- dplyr::left_join(map.winners.grouped, select(nat_data_2016_cart, id, x, y))
 ggplot(data=map.winners.grouped, aes(map_id=id)) + 
   geom_map(map=nat_map_2016, fill="grey90", colour="white") +
-  geom_point(data=map.winners.grouped, aes(x=x, y=y, colour=PartyNm), inherit.aes=FALSE) +
+  geom_point(data=map.winners.grouped, aes(x=x, y=y, colour=PartyNm),
+             alpha=0.6, inherit.aes=FALSE) +
   scale_colour_manual(name="Political Party", values=partycolours) +
   expand_limits(x=nat_map_2016$long, y=nat_map_2016$lat) +
   theme_map() + coord_equal() + theme(legend.position="bottom")
