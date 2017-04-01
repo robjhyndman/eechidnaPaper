@@ -83,17 +83,12 @@ knitr::opts_chunk$set(echo = FALSE, cache=TRUE, messages=FALSE, warning=FALSE)
 # Make sure you have rticles installed.
 library(eechidna)
 library(ggplot2)
-<<<<<<< Updated upstream
-library(tidyverse)
-library(broom)
-=======
 library(plyr)
 library(dplyr)
 library(purrr)
 library(knitr)
 library(broom)
 library(tidyr)
->>>>>>> Stashed changes
 ```
 
 
