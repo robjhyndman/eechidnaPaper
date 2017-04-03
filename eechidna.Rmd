@@ -650,7 +650,7 @@ map.winners <- aec2016_fp_electorate %>% filter(Elected == "Y") %>%
 map.winners$PartyNm <- as.character(map.winners$PartyNm)
 coalition <- c("Liberal", "The Nationals")
 map.winners.grouped <- mutate(map.winners, 
-    PartyNm = ifelse(PartyNm %in% coalition,
+    GpPartyNm = ifelse(PartyNm %in% coalition,
        "Liberal National Coalition", PartyNm))
 map.winners.grouped <- dplyr::left_join(map.winners.grouped,
           distinct(select(nat_map_2016, Elect_div, id)))
@@ -659,7 +659,7 @@ map.winners.grouped <- dplyr::left_join(map.winners.grouped,
 # Order = Australian Labor Party, Independent, Katters, Lib/Nats Coalition, Xenophon, The Greens
 partycolours = c("#FF0033", "#000000", "#CC3300", "#0066CC", "#FF6600", "#009900")
 ggplot(data=map.winners.grouped, aes(map_id=id)) + 
-  geom_map(aes(fill=PartyNm), map=nat_map_2016) +
+  geom_map(aes(fill=GpPartyNm), map=nat_map_2016) +
   scale_fill_manual(name="Political Party", values=partycolours) +
   expand_limits(x=nat_map_2016$long, y=nat_map_2016$lat) +
   theme_map() + coord_equal() + theme(legend.position="bottom")
@@ -674,12 +674,13 @@ data(nat_data_2016_cart)
 map.winners.grouped <- dplyr::left_join(map.winners.grouped, select(nat_data_2016_cart, id, x, y))
 ggplot(data=map.winners.grouped, aes(map_id=id)) + 
   geom_map(map=nat_map_2016, fill="grey90", colour="white") +
-  geom_point(data=map.winners.grouped, aes(x=x, y=y, colour=PartyNm),
+  geom_point(data=map.winners.grouped, aes(x=x, y=y, colour=GpPartyNm),
              alpha=0.6, inherit.aes=FALSE) +
   scale_colour_manual(name="Political Party", values=partycolours) +
   expand_limits(x=nat_map_2016$long, y=nat_map_2016$lat) +
   theme_map() + coord_equal() + theme(legend.position="bottom")
 ```
+
 #Shiny web app
 
 #Discussion
