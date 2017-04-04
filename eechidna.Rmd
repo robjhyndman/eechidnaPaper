@@ -162,8 +162,10 @@ The 2011 and 2016 Australian Census data were obtained from the Australian Burea
 
 
 ```{r make-data-dictionary, include = FALSE}
+cnames <- colnames(abs2011)
+
 data_dictionary <- data.frame(
-  Variable = paste("\\",colnames(abs2011),"|",sep=""),
+  Variable = paste("\\",setdiff(cnames, "region"),"|",sep=""),
   Details = c(
     "Commonwealth Electoral District identifier",
     "Name of electorate",
