@@ -110,7 +110,7 @@ The `nzelect` \citep{nzelect} package was an important inspiration for this pack
 
 The data for the 2013 and 2016 Australian Federal Elections for the House of Representative were obtained from \url{http://results.aec.gov.au/}. These data are copyright Commonwealth of Australia (Australian Electoral Commission) 2013, 2016.
 
-The election results are made available in csv format. There are many different summaries which matches the complexity of the Australian system that has a majority-preferential instant-runoff voting in the lower house, a single transferable vote proportional representation system in the upper house, and compulsory voting. In the `eechidna` package we have eight election datasets:
+The election results are made available in csv format. There are many different summaries which match the complexity of the Australian system that has a majority-preferential instant-runoff voting in the lower house, a single transferable vote proportional representation system in the upper house, and compulsory voting. In the `eechidna` package we have eight election datasets:
 
 \begin{table}[htb]\centering\small
 \begin{tabular}{ll}
@@ -138,7 +138,7 @@ The 2013 data sets contains `r formatC(nrow(aec2013_fp), big.mark=",", drop0trai
 
 ## Election Maps
 
-Spatial format files are used to distribute the the geographic extents of the electorates. The formats provided are ESRI and MapInfo which can be imported into R using a variety of tools. Maps are provided on the national, and also state level, and it is clear that the states are responsible for managing their electorate boundaries because there is some variation in formats and timing of release from state to state. These files allow the election map of the country to be drawn. The electorates do change from one election cycle to another. For example, between 2013 and 2016, Western Australia gained an electorate, NSW lost one, resulting in a renaming also, and the ACT changed and renamed one electorate. In addition, two electorates had their names spelled differently between the two years, Mcmillan to McMillan and Mcpherson to McPherson.
+Spatial format files are used to distribute the the geographic extents of the electorates. The formats provided are ESRI and MapInfo which can be imported into R using a variety of tools. Maps are provided on the national, and also state level, and it is clear that the states are responsible for managing their electorate boundaries because there is some variation in formats and timing of release from state to state. These files allow the election map of the country to be drawn. The electorates do change from one election cycle to another. For example, between 2013 and 2016, Western Australia gained an electorate, NSW lost one, resulting in a renaming also, and the ACT (Australian Capitol Territory) changed and renamed one electorate. In addition, two electorates had their names spelled differently between the two years, Mcmillan to McMillan and Mcpherson to McPherson.
 
 ```{r echo=FALSE}
 data(nat_map)
@@ -526,11 +526,11 @@ ggplot(data=map.winners.grouped, aes(map_id=id)) +
   theme_map() + coord_equal() + theme(legend.position="bottom")
 ```
 
-The usual approach to transform small areas on a map to better reflect the distribution of votes is a cartogram (XXX Needs citation). This works very nicely for the USA, where the electorate unit is a state. The geographic area of the states is relatively uniform compared to the Australian electorates' size, and so a cartogram gently expands the small areas, and shrinks the large to enable the gist of the results to be communicated nicely. However, vast open space of western Queensland, New South Wales, South Australia, Western Australia and the Northern Territory relative the the tiny electorates in the city breaks the algorithm, and at very best would so warp the Australian geography to make it unrecognisable. 
+The usual approach to transform small areas on a map to better reflect the distribution of votes is a cartogram. Diffusion-based cartograms~\cite{gastner2004} that keep areas contiguous work very nicely for the USA, where the electorate unit is a state. The geographic area of the states is relatively uniform compared to the Australian electorates' size, and so a cartogram gently expands the small areas, and shrinks the large to enable the gist of the results to be communicated nicely. However, the vast open space of western Queensland, New South Wales, South Australia, Western Australia and the Northern Territory relative to the tiny electorates in the city breaks the algorithm, and at very best would so warp the Australian geography to make it unrecognisable. 
 
-The solution we arrived at was to use a Dorling cartogram algorithm which represents geographic areas as circles, and gently shifts the circles to expand important small, close geographic regions. This algorithm is applied separately for each city, and the results are combined. Each electorate becomes a dot on the map, and the dots for city electorates are exploded, to enable each to be seen. Figure \ref{} shows this approach for the 2016 results. 
+The solution we arrived at was to use a Dorling cartogram algorithm \cite{dorling:1996} which represents geographic areas as circles, and gently shifts the circles to expand important small, close geographic regions. This algorithm is applied separately for each city, and the results are combined. Each electorate becomes a dot on the map, and the dots for city electorates are exploded, to enable each to be seen. Figure \ref{fig:diffusion} shows this approach for the 2016 results. 
 
-```{r message=FALSE, error = TRUE, warning=FALSE, echo=FALSE, fig.caption="Electoral results shown on the map. Impossible to get a sense of the results due to the sparseness of the Australian geography."}
+```{r message=FALSE, error = TRUE, warning=FALSE, echo=FALSE, fig.caption="Electoral results shown on the map. Impossible to get a sense of the results due to the sparseness of the Australian geography.\\label{fig:diffusion}"}
 data(nat_data_2016_cart)
 map.winners.grouped <- dplyr::left_join(map.winners.grouped, select(nat_data_2016_cart, id, x, y))
 ggplot(data=map.winners.grouped, aes(map_id=id)) + 
@@ -546,7 +546,7 @@ ggplot(data=map.winners.grouped, aes(map_id=id)) +
 
 #Discussion
 
-Discussion about difficulties and futrue development
+Discussion about difficulties and future development
 
 - what aec and abs could do better
 - updating for future elections and censuses
